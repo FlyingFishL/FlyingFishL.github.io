@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>Makefile基础规则</title>
+      <link href="/2023/04/10/Makefile%E5%9F%BA%E7%A1%80%E8%A7%84%E5%88%99/"/>
+      <url>/2023/04/10/Makefile%E5%9F%BA%E7%A1%80%E8%A7%84%E5%88%99/</url>
+      
+        <content type="html"><![CDATA[<h1 id="程序编译过程"><a href="#程序编译过程" class="headerlink" title="程序编译过程"></a>程序编译过程</h1><p>程序从源代码到可执行文件一般来说需要经过以下几个过程</p><ul><li>预处理（<code>Preprocessing</code>）：对源代码中的所有预处理指令（如<code>#include</code>、<code>#define</code>等）、注释、条件编译等进行处理，生成<code>.i</code>文件。在<code>GCC</code>中使用<code>-E</code>参数来指导编译器仅进行预处理操作。</li><li>编译（Compile）：对预处理后的源文件进行一系列语法分析、语义分析、词法分析及优化后生成相对应的包含汇编指令的<code>.s</code>文件。在<code>GCC</code>中使用<code>-S</code>参数来指导编译器只进行到编译操作。另外有时编译也指预处理、编译、汇编三个过程的集合或整个从源代码到可执行文件过程的集合。</li><li>汇编（Compilation）：将汇编代码转换为机器代码，生成<code>.o</code>文件，此时的<code>.o</code>文件为纯二进制文件。在<code>GCC</code>中使用<code>-c</code>参数来指导编译器只进行到汇编操作。</li><li>链接（Link）：将所有的<code>.o</code>文件和库（静态库）链接到一起，生成可执行文件（<code>Windows</code>下为<code>.exe</code>文件，<code>Linux</code>下为<code>.out</code>文件）。</li></ul><p>以上的所有过程的集合称为构建（<code>bulid</code>）。</p><h1 id="make和Makefile"><a href="#make和Makefile" class="headerlink" title="make和Makefile"></a>make和Makefile</h1><p><code>make</code>是一个自动化的编译和构建工具，它依赖于<code>Makefile</code>或者<code>makefile</code>文件，该文件中包含了编译和构建的指令以及依赖关系。</p><h1 id="Makefile基本格式"><a href="#Makefile基本格式" class="headerlink" title="Makefile基本格式"></a>Makefile基本格式</h1><p>最简单的<code>Makefile</code>由一系列规则组成，每条规则的格式如下</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;target&gt;...:&lt;prerequisites&gt;...</span><br><span class="line">&lt;recipe&gt;</span><br><span class="line">...</span><br><span class="line">...</span><br></pre></td></tr></table></figure><p><code>target</code>用于指定目标动作或者可执行文件名称，<code>prerequisites</code>为先决条件，可以是一个或多个文件，当<code>prerequisites</code>不存在或更新时间晚于<code>target</code>时，会再次执行其下的<code>recipe</code>。</p><p><code>recipe</code>是<code>make</code>需要执行的一个行为，可以是一条也可以是多条，可以放在一行也可以放在多行，需要注意的是，每行<code>recipe</code>之前需要包含一个制表符<code>Tab</code>。</p><p>当执行<code>make</code>命令时，如果不指定<code>target</code>，则默认执行<code>Makefile</code>的第一个<code>target</code>。</p><span id="more"></span><p>以下是官方文档中的一份示例，由8个<code>.c</code>源文件和3个<code>.h</code>头文件生成目标文件<code>edit</code></p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">edit : main.o kbd.o command.o display.o \</span><br><span class="line">       insert.o search.o files.o utils.o</span><br><span class="line">        cc -o edit main.o kbd.o command.o display.o \</span><br><span class="line">                   insert.o search.o files.o utils.o</span><br><span class="line"></span><br><span class="line">main.o : main.c defs.h</span><br><span class="line">        cc -c main.c</span><br><span class="line">kbd.o : kbd.c defs.h command.h</span><br><span class="line">        cc -c kbd.c</span><br><span class="line">command.o : command.c defs.h command.h</span><br><span class="line">        cc -c command.c</span><br><span class="line">display.o : display.c defs.h buffer.h</span><br><span class="line">        cc -c display.c</span><br><span class="line">insert.o : insert.c defs.h buffer.h</span><br><span class="line">        cc -c insert.c</span><br><span class="line">search.o : search.c defs.h buffer.h</span><br><span class="line">        cc -c search.c</span><br><span class="line">files.o : files.c defs.h buffer.h command.h</span><br><span class="line">        cc -c files.c</span><br><span class="line">utils.o : utils.c defs.h</span><br><span class="line">        cc -c utils.c</span><br><span class="line">clean :</span><br><span class="line">        rm edit main.o kbd.o command.o display.o \</span><br><span class="line">           insert.o search.o files.o utils.o</span><br></pre></td></tr></table></figure><p>当执行<code>make</code>命令时，首先进入第一个<code>target</code>，如果<code>target</code>，<code>make</code>会先更新其所有<code>prerequisites</code>，因为<code>prerequisites</code>可能是其他规则的<code>target</code>，所以实际上是一个递归执行的过程，当然，如果该<code>prerequisites</code>不存在，且在<code>Makefile</code>中又没有规则来指定如果生成它，那么就会报错。</p><p>示例中有以下需要注意的点：</p><ol><li><p>一个长行可使用<code>\</code>来将其分隔成多个短行。</p></li><li><p><code>make</code>并不知道<code>recipe</code>是如何工作的，只是在需要更新目标文件时执行指定的<code>recipe</code>。</p></li><li><p><code>clean</code>是一个目标而不是一个文件，且它不是任何<code>target</code>的先决条件，因此<code>make</code>命令不会对它做任何操作，除非指定执行<code>make clean</code>或者<code>clean</code>是第一个目标。</p></li><li><p>像<code>clean</code>这种不仅不是先决条件，本身也不具备先决条件，只为执行指定的操作而设定的目标被称为假目标（<code>Phony Targets</code>），但需要注意的是，如果刚好存在一个名为<code>clean</code>的文件，那么当执行<code>make clean</code>时，<code>make</code>检测到该文件已存在，那么就不会再去执行其<code>recipe</code>，为了避免该情况，可以使用<code>.PHONY</code>来将其声明为一个显式的伪目标。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.PHONY: clean</span><br><span class="line">clean</span><br><span class="line">&lt;recipe&gt;...</span><br></pre></td></tr></table></figure></li></ol><h1 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h1><p><code>Makefile</code>中允许使用变量来简化文件的编写，例如</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">objects = main.o kbd.o command.o display.o \</span><br><span class="line">          insert.o search.o files.o utils.o</span><br><span class="line"></span><br><span class="line">edit : $(objects)</span><br><span class="line">        cc -o edit $(objects)</span><br><span class="line">main.o : main.c defs.h</span><br><span class="line">        cc -c main.c</span><br><span class="line">kbd.o : kbd.c defs.h command.h</span><br><span class="line">        cc -c kbd.c</span><br><span class="line">command.o : command.c defs.h command.h</span><br><span class="line">        cc -c command.c</span><br><span class="line">display.o : display.c defs.h buffer.h</span><br><span class="line">        cc -c display.c</span><br><span class="line">insert.o : insert.c defs.h buffer.h</span><br><span class="line">        cc -c insert.c</span><br><span class="line">search.o : search.c defs.h buffer.h</span><br><span class="line">        cc -c search.c</span><br><span class="line">files.o : files.c defs.h buffer.h command.h</span><br><span class="line">        cc -c files.c</span><br><span class="line">utils.o : utils.c defs.h</span><br><span class="line">        cc -c utils.c</span><br><span class="line">clean :</span><br><span class="line">        rm edit $(objects)</span><br></pre></td></tr></table></figure><p>将所有的<code>.o</code>文件声明为一个<code>objects</code>对象，然后使用<code>$(objects)</code>来使用该变量。</p><h1 id="隐式规则"><a href="#隐式规则" class="headerlink" title="隐式规则"></a>隐式规则</h1><p><code>Makefile</code>中存在一条隐式规则，可以从相应命名的<code>.c</code>文件中自动更新和生成<code>.o</code>文件，因此可以省略其编译语句和<code>.c</code>依赖项。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">objects = main.o kbd.o command.o display.o \</span><br><span class="line">          insert.o search.o files.o utils.o</span><br><span class="line"></span><br><span class="line">edit : $(objects)</span><br><span class="line">        cc -o edit $(objects)</span><br><span class="line"></span><br><span class="line">main.o : defs.h</span><br><span class="line">kbd.o : defs.h command.h</span><br><span class="line">command.o : defs.h command.h</span><br><span class="line">display.o : defs.h buffer.h</span><br><span class="line">insert.o : defs.h buffer.h</span><br><span class="line">search.o : defs.h buffer.h</span><br><span class="line">files.o : defs.h buffer.h command.h</span><br><span class="line">utils.o : defs.h</span><br><span class="line"></span><br><span class="line">.PHONY : clean</span><br><span class="line">clean :</span><br><span class="line">        rm edit $(objects)</span><br></pre></td></tr></table></figure><h1 id="其他风格的Makefile"><a href="#其他风格的Makefile" class="headerlink" title="其他风格的Makefile"></a>其他风格的Makefile</h1><p>当<code>Makefile</code>的目标仅由隐式规则创造时，可以使用另一种<code>Makefile</code>风格样式，就是根据先决条件而不是目标进行分组</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">objects = main.o kbd.o command.o display.o \</span><br><span class="line">          insert.o search.o files.o utils.o</span><br><span class="line"></span><br><span class="line">edit : $(objects)</span><br><span class="line">        cc -o edit $(objects)</span><br><span class="line"></span><br><span class="line">$(objects) : defs.h</span><br><span class="line">kbd.o command.o files.o : command.h</span><br><span class="line">display.o insert.o search.o files.o : buffer.h</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> CMake和Makefile </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> C </tag>
+            
+            <tag> C++ </tag>
+            
+            <tag> Makefile </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>开始学习Git</title>
       <link href="/2023/04/09/%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0Git/"/>
       <url>/2023/04/09/%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0Git/</url>
@@ -20,9 +49,9 @@
       
         <tags>
             
-            <tag> GitHub </tag>
-            
             <tag> Git </tag>
+            
+            <tag> GitHub </tag>
             
         </tags>
       
@@ -47,9 +76,9 @@
       
         <tags>
             
-            <tag> Hexo </tag>
-            
             <tag> GitHub </tag>
+            
+            <tag> Hexo </tag>
             
             <tag> Blog </tag>
             
@@ -78,9 +107,9 @@
       
         <tags>
             
-            <tag> Hexo </tag>
-            
             <tag> GitHub </tag>
+            
+            <tag> Hexo </tag>
             
             <tag> Blog </tag>
             

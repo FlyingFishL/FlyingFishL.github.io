@@ -191,6 +191,96 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/10/Makefile%E5%9F%BA%E7%A1%80%E8%A7%84%E5%88%99/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lu">
+      <meta itemprop="description" content="遇事不决，可问春风">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/04/10/Makefile%E5%9F%BA%E7%A1%80%E8%A7%84%E5%88%99/" class="post-title-link" itemprop="url">Makefile基础规则</a>
+        </h2>
+
+        <div class="post-meta">
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-04-10 23:30:35 / 修改时间：23:31:13" itemprop="dateCreated datePublished" datetime="2023-04-10T23:30:35+08:00">2023-04-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CMake%E5%92%8CMakefile/" itemprop="url" rel="index"><span itemprop="name">CMake和Makefile</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="程序编译过程"><a href="#程序编译过程" class="headerlink" title="程序编译过程"></a>程序编译过程</h1><p>程序从源代码到可执行文件一般来说需要经过以下几个过程</p>
+<ul>
+<li>预处理（<code>Preprocessing</code>）：对源代码中的所有预处理指令（如<code>#include</code>、<code>#define</code>等）、注释、条件编译等进行处理，生成<code>.i</code>文件。在<code>GCC</code>中使用<code>-E</code>参数来指导编译器仅进行预处理操作。</li>
+<li>编译（Compile）：对预处理后的源文件进行一系列语法分析、语义分析、词法分析及优化后生成相对应的包含汇编指令的<code>.s</code>文件。在<code>GCC</code>中使用<code>-S</code>参数来指导编译器只进行到编译操作。另外有时编译也指预处理、编译、汇编三个过程的集合或整个从源代码到可执行文件过程的集合。</li>
+<li>汇编（Compilation）：将汇编代码转换为机器代码，生成<code>.o</code>文件，此时的<code>.o</code>文件为纯二进制文件。在<code>GCC</code>中使用<code>-c</code>参数来指导编译器只进行到汇编操作。</li>
+<li>链接（Link）：将所有的<code>.o</code>文件和库（静态库）链接到一起，生成可执行文件（<code>Windows</code>下为<code>.exe</code>文件，<code>Linux</code>下为<code>.out</code>文件）。</li>
+</ul>
+<p>以上的所有过程的集合称为构建（<code>bulid</code>）。</p>
+<h1 id="make和Makefile"><a href="#make和Makefile" class="headerlink" title="make和Makefile"></a>make和Makefile</h1><p><code>make</code>是一个自动化的编译和构建工具，它依赖于<code>Makefile</code>或者<code>makefile</code>文件，该文件中包含了编译和构建的指令以及依赖关系。</p>
+<h1 id="Makefile基本格式"><a href="#Makefile基本格式" class="headerlink" title="Makefile基本格式"></a>Makefile基本格式</h1><p>最简单的<code>Makefile</code>由一系列规则组成，每条规则的格式如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;target&gt;...:&lt;prerequisites&gt;...</span><br><span class="line">	&lt;recipe&gt;</span><br><span class="line">	...</span><br><span class="line">	...</span><br></pre></td></tr></table></figure>
+
+<p><code>target</code>用于指定目标动作或者可执行文件名称，<code>prerequisites</code>为先决条件，可以是一个或多个文件，当<code>prerequisites</code>不存在或更新时间晚于<code>target</code>时，会再次执行其下的<code>recipe</code>。</p>
+<p><code>recipe</code>是<code>make</code>需要执行的一个行为，可以是一条也可以是多条，可以放在一行也可以放在多行，需要注意的是，每行<code>recipe</code>之前需要包含一个制表符<code>Tab</code>。</p>
+<p>当执行<code>make</code>命令时，如果不指定<code>target</code>，则默认执行<code>Makefile</code>的第一个<code>target</code>。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/04/10/Makefile%E5%9F%BA%E7%A1%80%E8%A7%84%E5%88%99/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/09/%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0Git/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -529,20 +619,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
